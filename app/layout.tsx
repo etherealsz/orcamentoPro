@@ -5,7 +5,7 @@ export const metadata = {
   description: 'Gerador de orçamentos para profissionais',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }: { children: React.ReactNode }) {
   return (
     <html lang="pt">
       <body>{children}</body>
