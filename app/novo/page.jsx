@@ -29,77 +29,82 @@ export default function NovoOrcamento() {
   const iva = subtotal * 0.23
   const total = subtotal + iva
 
-  const gerarPDF = useCallback(async () => {
-    const jsPDF = (await import('jspdf')).default
-    const doc = new jsPDF()
+  const gerarPDF = useCallback(() => {
+    const script = document.createElement('script')
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+    script.onload = () => {
+      const { jsPDF } = window.jspdf
+      const doc = new jsPDF()
 
-    const data = new Date().toLocaleDateString('pt-PT')
-    const numero = 'ORC-' + String(Math.floor(Math.random() * 99999)).padStart(5, '0')
+      const data = new Date().toLocaleDateString('pt-PT')
+      const numero = 'ORC-' + String(Math.floor(Math.random() * 99999)).padStart(5, '0')
 
-    doc.setFillColor(26, 26, 46)
-    doc.rect(0, 0, 210, 30, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(22)
-    doc.setFont('helvetica', 'bold')
-    doc.text(empresa || 'A tua empresa', 14, 20)
+      doc.setFillColor(26, 26, 46)
+      doc.rect(0, 0, 210, 30, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(22)
+      doc.setFont('helvetica', 'bold')
+      doc.text(empresa || 'A tua empresa', 14, 20)
 
-    doc.setFontSize(10)
-    doc.setTextColor(180, 180, 200)
-    doc.text('N\u00ba ' + numero + '  \u00b7  ' + data, 14, 40)
+      doc.setFontSize(10)
+      doc.setTextColor(180, 180, 200)
+      doc.text('N\u00ba ' + numero + '  \u00b7  ' + data, 14, 40)
 
-    doc.setTextColor(100, 100, 110)
-    doc.setFontSize(9)
-    doc.text('OR\u00c7AMENTO PARA', 14, 55)
-    doc.setTextColor(26, 26, 46)
-    doc.setFontSize(13)
-    doc.setFont('helvetica', 'bold')
-    doc.text(cliente || 'Cliente', 14, 63)
-
-    doc.setFillColor(26, 26, 46)
-    doc.rect(14, 72, 182, 8, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(8)
-    doc.setFont('helvetica', 'bold')
-    doc.text('DESCRI\u00c7\u00c3O', 18, 77.5)
-    doc.text('QTD', 120, 77.5)
-    doc.text('PRE\u00c7O UNIT.', 140, 77.5)
-    doc.text('TOTAL', 178, 77.5, { align: 'right' })
-
-    let y = 86
-    doc.setFont('helvetica', 'normal')
-    itens.forEach((item, i) => {
-      if (!item.descricao) return
-      const bg = i % 2 === 0 ? [247, 246, 242] : [255, 255, 255]
-      doc.setFillColor(bg[0], bg[1], bg[2])
-      doc.rect(14, y - 4, 182, 9, 'F')
-      doc.setTextColor(40, 40, 50)
+      doc.setTextColor(100, 100, 110)
       doc.setFontSize(9)
-      doc.text(item.descricao, 18, y + 1)
-      doc.text(String(item.quantidade), 122, y + 1)
-      doc.text(parseFloat(item.preco || 0).toFixed(2) + ' \u20ac', 142, y + 1)
-      const linha = (parseFloat(item.preco) || 0) * (parseInt(item.quantidade) || 0)
-      doc.text(linha.toFixed(2) + ' \u20ac', 194, y + 1, { align: 'right' })
-      y += 10
-    })
+      doc.text('OR\u00c7AMENTO PARA', 14, 55)
+      doc.setTextColor(26, 26, 46)
+      doc.setFontSize(13)
+      doc.setFont('helvetica', 'bold')
+      doc.text(cliente || 'Cliente', 14, 63)
 
-    y += 6
-    doc.setFontSize(10)
-    doc.setTextColor(120, 120, 130)
-    doc.text('Subtotal', 140, y)
-    doc.text(subtotal.toFixed(2) + ' \u20ac', 194, y, { align: 'right' })
-    y += 7
-    doc.text('IVA (23%)', 140, y)
-    doc.text(iva.toFixed(2) + ' \u20ac', 194, y, { align: 'right' })
-    y += 8
-    doc.setDrawColor(200, 200, 210)
-    doc.line(140, y - 3, 196, y - 3)
-    doc.setFontSize(13)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(26, 26, 46)
-    doc.text('TOTAL', 140, y + 4)
-    doc.text(total.toFixed(2) + ' \u20ac', 194, y + 4, { align: 'right' })
+      doc.setFillColor(26, 26, 46)
+      doc.rect(14, 72, 182, 8, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+      doc.text('DESCRI\u00c7\u00c3O', 18, 77.5)
+      doc.text('QTD', 120, 77.5)
+      doc.text('PRE\u00c7O UNIT.', 140, 77.5)
+      doc.text('TOTAL', 178, 77.5, { align: 'right' })
 
-    doc.save('orcamento-' + numero + '.pdf')
+      let y = 86
+      doc.setFont('helvetica', 'normal')
+      itens.forEach((item, i) => {
+        if (!item.descricao) return
+        const bg = i % 2 === 0 ? [247, 246, 242] : [255, 255, 255]
+        doc.setFillColor(bg[0], bg[1], bg[2])
+        doc.rect(14, y - 4, 182, 9, 'F')
+        doc.setTextColor(40, 40, 50)
+        doc.setFontSize(9)
+        doc.text(item.descricao, 18, y + 1)
+        doc.text(String(item.quantidade), 122, y + 1)
+        doc.text(parseFloat(item.preco || 0).toFixed(2) + ' \u20ac', 142, y + 1)
+        const linha = (parseFloat(item.preco) || 0) * (parseInt(item.quantidade) || 0)
+        doc.text(linha.toFixed(2) + ' \u20ac', 194, y + 1, { align: 'right' })
+        y += 10
+      })
+
+      y += 6
+      doc.setFontSize(10)
+      doc.setTextColor(120, 120, 130)
+      doc.text('Subtotal', 140, y)
+      doc.text(subtotal.toFixed(2) + ' \u20ac', 194, y, { align: 'right' })
+      y += 7
+      doc.text('IVA (23%)', 140, y)
+      doc.text(iva.toFixed(2) + ' \u20ac', 194, y, { align: 'right' })
+      y += 8
+      doc.setDrawColor(200, 200, 210)
+      doc.line(140, y - 3, 196, y - 3)
+      doc.setFontSize(13)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(26, 26, 46)
+      doc.text('TOTAL', 140, y + 4)
+      doc.text(total.toFixed(2) + ' \u20ac', 194, y + 4, { align: 'right' })
+
+      doc.save('orcamento-' + numero + '.pdf')
+    }
+    document.head.appendChild(script)
   }, [empresa, cliente, itens, subtotal, iva, total])
 
   return (
